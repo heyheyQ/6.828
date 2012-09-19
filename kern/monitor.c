@@ -24,6 +24,7 @@ struct Command {
 static struct Command commands[] = {
 	{ "help", "Display this list of commands", mon_help },
 	{ "kerninfo", "Display information about the kernel", mon_kerninfo },
+        { "backtrace", "Display the call stacks", mon_backtrace },
 };
 #define NCOMMANDS (sizeof(commands)/sizeof(commands[0]))
 
@@ -59,8 +60,36 @@ mon_kerninfo(int argc, char **argv, struct Trapframe *tf)
 int
 mon_backtrace(int argc, char **argv, struct Trapframe *tf)
 {
-	// Your code here.
-	return 0;
+  // Your code here.
+  unsigned int ebpval;
+  unsigned int *i;
+  unsigned int oldebp;
+//  unsigned int j;
+  struct Eipdebuginfo info;
+  int ret;
+  unsigned int eipval;
+
+  ebpval = read_ebp();
+//  for (j = 0; j < 10; j++) {
+  while (ebpval >= ULIM) {
+    i = (unsigned int *)ebpval;
+    oldebp = *i;
+//    cprintf ("ebp %x, eip %x, ", ebpval, *(++i));
+    eipval = *(++i);
+    cprintf ("ebp %x, eip %x, ", ebpval, eipval);
+    cprintf ("args %0x ", *(++i));
+    cprintf ("%0x ", *(++i));
+    cprintf ("%0x ", *(++i));
+    cprintf ("%0x ", *(++i));
+    cprintf ("%0x \n", *(++i));
+    ebpval = oldebp;
+    //debuginfo extract
+    ret = debuginfo_eip((uintptr_t)eipval, &info);
+    if (ret != (-1)) {
+      cprintf ("%s: %d: %.*s+ %x\n", info.eip_file, info.eip_line, info.eip_fn_namelen, info.eip_fn_name, (eipval-info.eip_fn_addr));
+    }
+  }
+  return 0;
 }
 
 
@@ -113,7 +142,12 @@ void
 monitor(struct Trapframe *tf)
 {
 	char *buf;
-
+//test start
+//        int x = 1, y = 10, z = 4;
+//        cprintf("x %d, y %x, z %d\n", x, y, z);
+        unsigned int i = 0x00646c72;
+        cprintf ("H%x Wo%s", 57616, &i);
+//test end
 	cprintf("Welcome to the JOS kernel monitor!\n");
 	cprintf("Type 'help' for a list of commands.\n");
 
