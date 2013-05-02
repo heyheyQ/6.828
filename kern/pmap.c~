@@ -216,7 +216,9 @@ mem_init(void)
 	// Permissions: kernel RW, user NONE
 	// Your code goes here:
 //heyq
-    for (n = KERNBASE; n < ROUNDDOWN((uint32_t)(-1), PGSIZE); n+=PGSIZE) {
+//    for (n = KERNBASE; (n <= (uint32_t)(-1)) && (n / PGSIZE < npages); n+=PGSIZE) {
+    for (n = KERNBASE; n < ROUNDDOWN((uint32_t)(-1), PGSIZE)/* && (PADDR((void *)n) / PGSIZE < npages)*/; n+=PGSIZE) {
+//      cprintf ("n = 0x%08lx\n", n);  
 //      if (PADDR((void *)n) / PGSIZE < npages) {  
 //        newPage = pa2page(PADDR((void *)n));
 //        page_insert(kern_pgdir, newPage, (void *)n, PTE_W);  //don't use page_insert if newPage is not from page_alloc() !!
