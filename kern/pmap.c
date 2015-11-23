@@ -167,6 +167,9 @@ mem_init(void)
 	//////////////////////////////////////////////////////////////////////
 	// Make 'envs' point to an array of size 'NENV' of 'struct Env'.
 	// LAB 3: Your code here.
+    n = NENV * sizeof (struct Env);
+    envs = (struct Env *)boot_alloc (ROUNDUP (n, PGSIZE));
+//	memset(envs, 0, ROUNDUP (n, PGSIZE));
 
 	//////////////////////////////////////////////////////////////////////
 	// Now that we've allocated the initial kernel data structures, we set
@@ -203,6 +206,10 @@ mem_init(void)
 	//    - the new image at UENVS  -- kernel R, user R
 	//    - envs itself -- kernel RW, user NONE
 	// LAB 3: Your code here.
+    for (n = 0; n < ROUNDUP(NENV * sizeof (struct Env), PGSIZE); n+=PGSIZE) {
+      tempPage = pa2page(PADDR(envs) + n);  //map the 'envs' array    
+      page_insert(kern_pgdir, tempPage, (void *)(UENVS + n), PTE_W);
+    }
 
 	//////////////////////////////////////////////////////////////////////
 	// Use the physical memory that 'bootstack' refers to as the kernel
@@ -692,6 +699,46 @@ int
 user_mem_check(struct Env *env, const void *va, size_t len, int perm)
 {
 	// LAB 3: Your code here.
+	size_t n;
+    pte_t *ptentry;
+//    size_t shift = 0;
+
+    if (((size_t)va >= ULIM) || (((size_t)va+len) > ULIM)) {
+        user_mem_check_addr = (uintptr_t)va;
+        return -E_FAULT;
+    }
+
+    //first page
+    n = ROUNDDOWN((size_t)va, PGSIZE);
+    ptentry = pgdir_walk(env->env_pgdir, (const void *)n, 0);
+    if (ptentry) {
+        if (((*ptentry) & (perm | PTE_P)) != (perm | PTE_P)) {
+            user_mem_check_addr = (uintptr_t)va;
+            return -E_FAULT;
+        }
+    } /*else {
+        // ??
+    }*/
+
+//    for (n = ROUNDDOWN((size_t)va, PGSIZE), shift = ((size_t)va - n); 
+//         n < ROUNDUP((size_t)va+len, PGSIZE); 
+//         n += PGSIZE) {
+    for (n = ROUNDUP((size_t)va, PGSIZE); 
+         n < ROUNDUP((size_t)va+len, PGSIZE); 
+         n += PGSIZE) {
+
+
+        ptentry = pgdir_walk(env->env_pgdir, (const void *)n, 0);
+        if (ptentry) {
+            if (((*ptentry) & (perm | PTE_P)) != (perm | PTE_P)) {
+//                user_mem_check_addr = (uintptr_t)(n+shift);
+                user_mem_check_addr = (uintptr_t)n;
+                return -E_FAULT;
+            }
+        } /*else {
+            // ??
+        }*/
+    }
 
 	return 0;
 }

@@ -59,5 +59,8 @@ envid_t
 sys_getenvid(void)
 {
 	 return syscall(SYS_getenvid, 0, 0, 0, 0, 0, 0);
+//    envid_t tmp = syscall(SYS_getenvid, 0, 0, 0, 0, 0, 0);
+//    cprintf ("heyQ: lib/syscall.c: sys_getenvid returns %08x\n", tmp);
+//	return tmp;
 }
 

@@ -65,14 +65,14 @@ mon_backtrace(int argc, char **argv, struct Trapframe *tf)
   unsigned int ebpval;
   unsigned int *i;
   unsigned int oldebp;
-//  unsigned int j;
+  unsigned int j;
   struct Eipdebuginfo info;
   int ret;
   unsigned int eipval;
 
   ebpval = read_ebp();
-//  for (j = 0; j < 10; j++) {
-  while (ebpval >= ULIM) {
+  for (j = 0; j < 10; j++) {
+//  while (ebpval >= ULIM) {
     i = (unsigned int *)ebpval;
     oldebp = *i;
 //    cprintf ("ebp %x, eip %x, ", ebpval, *(++i));
@@ -143,12 +143,12 @@ void
 monitor(struct Trapframe *tf)
 {
 	char *buf;
-//test start
+//heyq test start
 //        int x = 1, y = 10, z = 4;
 //        cprintf("x %d, y %x, z %d\n", x, y, z);
-        unsigned int i = 0x00646c72;
-        cprintf ("H%x Wo%s", 57616, &i);
-//test end
+//        unsigned int i = 0x00646c72;
+//        cprintf ("H%x Wo%s", 57616, &i);
+//heyq test end
 	cprintf("Welcome to the JOS kernel monitor!\n");
 	cprintf("Type 'help' for a list of commands.\n");
 
