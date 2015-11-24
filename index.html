@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>6.828 by heyheyQ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">6.828</h1>
+      <h2 class="project-tagline">Labs of MIT OpenCourseWare 6.828: Operating System Engineering 2011</h2>
+      <a href="https://github.com/heyheyQ/6.828" class="btn">View on GitHub</a>
+      <a href="https://github.com/heyheyQ/6.828/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/heyheyQ/6.828/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h2>
+<a id="lab-1-booting-a-pc" class="anchor" href="#lab-1-booting-a-pc" aria-hidden="true"><span class="octicon octicon-link"></span></a>Lab 1: Booting a PC</h2>
+
+<h3>
+<a id="part-1-pc-bootstrap" class="anchor" href="#part-1-pc-bootstrap" aria-hidden="true"><span class="octicon octicon-link"></span></a>Part 1: PC Bootstrap</h3>
+
+<ul>
+<li>Study the guide to inline assembly for x86 in Linux. The rules include register naming (%eax), source and destination ordering, immediate operand ($0xffff), indirect memory reference.</li>
+<li>Use the QEMU emulator simulating the x86 hardware to boot the compiled kernel, and use the GNU debugger (GDB) to step through the early boot process.</li>
+<li>Learn the layout of the PC's physical address space including where the BIOS is loaded into and where the memory mapped devices (MMIO) lies.</li>
+<li>Investigate how an IA-32 compatible computer boots.
+
+<ul>
+<li>Simplified flow is: BIOS (at physical address 0x000ffff0) =&gt; bootloader loaded at IP=0x7c00 =&gt; bootloader reads the remaining sectors of the kernel from the disk.</li>
+</ul>
+</li>
+</ul>
+
+<h3>
+<a id="part-2-the-boot-loader" class="anchor" href="#part-2-the-boot-loader" aria-hidden="true"><span class="octicon octicon-link"></span></a>Part 2: The Boot Loader</h3>
+
+<ul>
+<li>The bootloader is composed of boot.S and main.c in source code of lab1.
+
+<ul>
+<li>The work of boot.S:
+
+<ul>
+<li>cli, cld : disable interrupts</li>
+<li>Enable A20 gate to enable decoding of memory &gt;= 1MB, and load gtdr to fill the segment descriptors table.</li>
+<li>Switch from real mode to protected mode, by setting bit 0 of CR0, and ljmp to load new %cs.</li>
+<li>(in protected mode) Set %esp to setup kernel stack growing down from 0x7c00, and call bootmain (the part of bootloader in C).</li>
+</ul>
+</li>
+<li>The work of main.c:
+
+<ul>
+<li>Read 4096bytes from the 1st sector of harddisk by accessing the I/O port of ATA bus, and decode the ELF header with loading information.</li>
+<li>The link address of the kernel is at 0x100000 that is defined in kernel.ld</li>
+<li>Load the kernel to load address (LMA) defined in ELF segment information.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<h3>
+<a id="part-3-kernel" class="anchor" href="#part-3-kernel" aria-hidden="true"><span class="octicon octicon-link"></span></a>Part 3: Kernel</h3>
+
+<ul>
+<li>Map the first 4MB of physical memory using the statically-initialized page directory and page table in kern/entrypgdir.c.</li>
+<li>Program the code to support formatted printing to the console (refer to lib/printfmt.c).</li>
+<li>According to the C calling conventions on the x86 and the content of stack when the nested call instructions execute, implement a stack backtrace function (refer to kern/monitor.c). </li>
+<li>Modify the stack backtrace function to display, for each eip, the function name, source file name, and line number corresponding to that eip (refer to kern/kdebug.c).</li>
+</ul>
+
+<h2>
+<a id="lab-2-memory-management" class="anchor" href="#lab-2-memory-management" aria-hidden="true"><span class="octicon octicon-link"></span></a>Lab 2: Memory management</h2>
+
+<h3>
+<a id="part-1-physical-page-management" class="anchor" href="#part-1-physical-page-management" aria-hidden="true"><span class="octicon octicon-link"></span></a>Part 1: Physical Page Management</h3>
+
+<ul>
+<li>Implement the physical page allocator (refer to kern/pmap.c), which requires the knowledge of hardware structures to manage memory in x86 hardware.
+
+<ul>
+<li>The translation between logical address, linear address, and physical address.</li>
+<li>Segmentation: global descriptor table (GDT) and local descriptor table (LDT), segment registers, segment selectors, and the fields affecting how the memory controller translates the addresses</li>
+<li>Virtual address and page table</li>
+</ul>
+</li>
+</ul>
+
+<h3>
+<a id="part-2-virtual-memory" class="anchor" href="#part-2-virtual-memory" aria-hidden="true"><span class="octicon octicon-link"></span></a>Part 2: Virtual Memory</h3>
+
+<ul>
+<li>Write a set of routines to manage page tables: to insert and remove linear-to-physical mappings, and to create page table pages when needed (refer to kern/pmap.c).</li>
+</ul>
+
+<h3>
+<a id="part-3-kernel-address-space" class="anchor" href="#part-3-kernel-address-space" aria-hidden="true"><span class="octicon octicon-link"></span></a>Part 3: Kernel Address Space</h3>
+
+<ul>
+<li>Initialize the kernel address space by completing function mem_init() in kern/pmap.c
+
+<ul>
+<li>Set up the address space above UTOP in inc/memlayout.h</li>
+</ul>
+</li>
+</ul>
+
+<h2>
+<a id="lab-3-user-environments" class="anchor" href="#lab-3-user-environments" aria-hidden="true"><span class="octicon octicon-link"></span></a>Lab 3: User Environments</h2>
+
+<ul>
+<li>Goal: Initially create one user environment, and then design the JOS kernel to support multiple environments.</li>
+</ul>
+
+<h3>
+<a id="part-a-user-environments-and-exception-handling" class="anchor" href="#part-a-user-environments-and-exception-handling" aria-hidden="true"><span class="octicon octicon-link"></span></a>Part A: User Environments and Exception Handling</h3>
+
+<ul>
+<li>a JOS "environment" couples the concepts of "thread" and "address space":
+
+<ul>
+<li>The thread is defined by the saved registers (e.g., struct env_tf stands for the trap frame)</li>
+<li>The address space is defined by the page directory and page tables (i.e., struct env_pgdir)</li>
+<li>There can be only a JOS environment active in the kernel at a time, so JOS needs only a single kernel stack.</li>
+</ul>
+</li>
+<li>Modify mem_init() in kern/pmap.c to allocate and map the struct envs array.</li>
+<li>Create and run environments:
+
+<ul>
+<li>Because we do not yet have a filesystem, we set up the kernel to load a static binary image that is built-in the kernel itself.
+
+<ul>
+<li>Refer to the -b binary option on the linker command line in kern/Makefrag</li>
+</ul>
+</li>
+<li>Implement the functions in env.c to set up a JOS user environment:
+
+<ul>
+<li>Configures the segmentation hardware with separate segments for privilege level 0 (kernel) and privilege level 3 (user).
+(refer to env_init() in env.c)
+
+<ul>
+<li>With the knowledge of 2-level virtual address translation: PDE (entry of page directory) and PTE (entry of page table)</li>
+</ul>
+</li>
+<li>Allocate a page directory for a new environment and initialize the kernel portion of the new environment's address space.
+(refer to env_setup_vm() in env.c)</li>
+<li>Parse an ELF binary image, and load its contents into the user address space of a new environment.
+(refer to load_icode() in env.c)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Handle interrupts and exceptions:
+
+<ul>
+<li>Implement basic exception and system call handling for kernel to recover control of the processor from user-mode code.
+
+<ul>
+<li>With the knowledge of the x86 interrupt and exception mechanism</li>
+</ul>
+</li>
+<li>An interrupt is a protected control transfer that is caused by an asynchronous event usually external to the processor.
+
+<ul>
+<li>The interrupt descriptor table (IDT):
+
+<ul>
+<li>Interrupt vectors 0-255, the vector is used as an index into the processor's interrupt descriptor table</li>
+<li>an IDT entry contains CS, EIP of the instruction of interrupt handler; bit 0-1 of CS stands for the privilege level in which the instruction executes.</li>
+</ul>
+</li>
+<li>The task state segment (TSS):
+
+<ul>
+<li>A structure specifies the segment selector and address where the stack lives.</li>
+<li>JOS only uses TSS to define the kernel stack that the processor should switch to when it transfers from user to kernel mode. The processor uses the ESP0 and SS0 fields of the TSS to define the kernel stack when entering kernel mode.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Set up the IDT:
+
+<ul>
+<li>Edit trapentry.S and trap.c to initialize the IDT with the addresses of the interrupt handlers, and add an entry point in trapentry.S for each trap defined in inc/trap.h.</li>
+<li>Test the trap handling code using some of the test programs in the user directory that cause exceptions, such as user/divzero.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<h3>
+<a id="part-b-page-faults-breakpoints-exceptions-and-system-calls" class="anchor" href="#part-b-page-faults-breakpoints-exceptions-and-system-calls" aria-hidden="true"><span class="octicon octicon-link"></span></a>Part B: Page Faults, Breakpoints Exceptions, and System Calls</h3>
+
+<ul>
+<li>Handle page faults:
+
+<ul>
+<li>Modify trap_dispatch() in kern/trap.c to dispatch page fault exceptions to page_fault_handler().
+
+<ul>
+<li>The page fault exception is handled in interrupt vector 14 (T_PGFLT) that stores the linear address that caused the fault in a special processor control register, CR2.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>The breakpoint exception:
+
+<ul>
+<li>Modify trap_dispatch() in kern/trap.c to make breakpoint exceptions invoke the kernel monitor.
+
+<ul>
+<li>The breakpoint exception is handled in interrupt vector 3 (T_BRKPT). Debuggers insert breakpoints in a program's code by temporarily replacing the relevant program instruction with the special 1-byte int3 software interrupt instruction.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>System calls:
+
+<ul>
+<li>Edit kern/trapentry.S and trap_init() in kern/trap.c to add a handler in the kernel for interrupt vector T_SYSCALL, and change trap_dispatch() to handle the system call interrupt by calling syscall().
+
+<ul>
+<li>Use int $0x30 as the system call interrupt, and set up the interrupt descriptor to allow user processes to cause the interrupt.</li>
+<li>The application passes the system call number and the system call arguments in registers. The kernel passes the return value back in %eax.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>User-mode startup:
+
+<ul>
+<li>Modify libmain() in lib/libmain.c to initialize the global pointer thisenv to point at the environment's struct Env in the envs[] array.
+
+<ul>
+<li>A user program starts running at the top of lib/entry.S.</li>
+</ul>
+</li>
+<li>See that user/hello print "hello, world" and then print "i am environment 00001000", then attempts to exit by calling sys_env_destroy().
+
+<ul>
+<li>The kernel should report that it has destroyed the only environment and then drop into the kernel monitor.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Page faults and memory protection:
+
+<ul>
+<li>Operating systems usually rely on hardware support to implement memory protection.</li>
+<li>The OS keeps the hardware informed about which virtual addresses are valid and which are not.</li>
+<li>When a program tries to access an invalid address or one for which it has no permissions, the processor stops the program at the instruction causing the fault and then traps into the kernel with information about the attempted operation.</li>
+<li>As an example of a fixable fault, consider an automatically extended stack:
+
+<ul>
+<li>The kernel initially allocates a single stack page, and then if a program faults accessing pages further down the stack, the kernel will allocate those pages automatically and let the program continue.</li>
+</ul>
+</li>
+<li>Change kern/trap.c to panic if a page fault happens in kernel mode.
+
+<ul>
+<li>Check the low bits of the struct tf_cs</li>
+</ul>
+</li>
+<li>Implement user_mem_check() in kern/pmap.c
+
+<ul>
+<li>Read user_mem_assert in kern/pmap.c</li>
+</ul>
+</li>
+<li>Change kern/syscall.c to check arguments to system calls
+
+<ul>
+<li>Boot the kernel, running user/buggyhello. The environment should be destroyed, and the kernel should not panic.</li>
+</ul>
+</li>
+<li>Change debuginfo_eip in kern/kdebug.c to call user_mem_check on usd, stabs, and stabstr.
+
+<ul>
+<li>Run user/breakpoint, and run backtrace from the kernel monitor and see the backtrace traverse into lib/libmain.c.</li>
+</ul>
+</li>
+<li>Boot the kernel, running user/evilhello. The environment should be destroyed, and the kernel should not panic.</li>
+</ul>
+</li>
+</ul>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/heyheyQ/6.828">6.828</a> is maintained by <a href="https://github.com/heyheyQ">heyheyQ</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
