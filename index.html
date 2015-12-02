@@ -258,9 +258,18 @@
 <a id="part-b-page-faults-breakpoints-exceptions-and-system-calls" class="anchor" href="#part-b-page-faults-breakpoints-exceptions-and-system-calls" aria-hidden="true"><span class="octicon octicon-link"></span></a>Part B: Page Faults, Breakpoints Exceptions, and System Calls</h3>
 
 <ul>
-<li>Handle page faults:
+<li>Objectives:</li>
+<ol type = "1">
+<li>Handle page faults</li>
+<li>Handle the breakpoint exception</li>
+<li>Implement System calls</li>
+<li>Startup user-mode</li>
+<li>Test Page faults and memory protection in kernel</li>
+</ol>
 
+<li>Procedures:</li>
 <ul>
+<li> 1.</li>
 <li>Modify trap_dispatch() in kern/trap.c to dispatch page fault exceptions to page_fault_handler().
 
 <ul>
@@ -268,9 +277,8 @@
 </ul>
 </li>
 </ul>
-</li>
-<li>The breakpoint exception:
 
+<li> 2.</li>
 <ul>
 <li>Modify trap_dispatch() in kern/trap.c to make breakpoint exceptions invoke the kernel monitor.
 
@@ -280,8 +288,8 @@
 </li>
 </ul>
 </li>
-<li>System calls:
 
+<li> 3.</li>
 <ul>
 <li>Edit kern/trapentry.S and trap_init() in kern/trap.c to add a handler in the kernel for interrupt vector T_SYSCALL, and change trap_dispatch() to handle the system call interrupt by calling syscall().
 
@@ -292,8 +300,8 @@
 </li>
 </ul>
 </li>
-<li>User-mode startup:
 
+<li> 4.</li>
 <ul>
 <li>Modify libmain() in lib/libmain.c to initialize the global pointer thisenv to point at the environment's struct Env in the envs[] array.
 
@@ -309,8 +317,8 @@
 </li>
 </ul>
 </li>
-<li>Page faults and memory protection:
 
+<li> 5.</li>
 <ul>
 <li>Operating systems usually rely on hardware support to implement memory protection.</li>
 <li>The OS keeps the hardware informed about which virtual addresses are valid and which are not.</li>
