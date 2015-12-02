@@ -226,16 +226,13 @@
 <ul>
 <li>Modify mem_init() in kern/pmap.c to allocate and map the struct envs array.</li>
 
-<ul>
 <li>Set up the kernel to load a static binary image that is built-in the kernel itself, because the lack of filesystem.
 
 <ul>
 <li>Refer to the -b binary option on the linker command line in kern/Makefrag</li>
 </ul>
 </li>
-<li>Implement the functions in env.c to set up a JOS user environment:
 
-<ul>
 <li>Configures the segmentation hardware with separate segments for privilege level 0 (kernel) and privilege level 3 (user).
 (refer to env_init() in env.c)
 
@@ -244,14 +241,10 @@
 (refer to env_setup_vm() in env.c)</li>
 <li>Parse an ELF binary image, and load its contents into the user address space of a new environment.
 (refer to load_icode() in env.c)</li>
-</ul>
 </li>
 </ul>
 
 <li>Implement basic exception and system call handling for kernel to recover control of the processor from user-mode code.</li>
-
-<li>Set up the IDT:
-
 <ul>
 <li>Edit trapentry.S and trap.c to initialize the IDT with the addresses of the interrupt handlers, and add an entry point in trapentry.S for each trap defined in inc/trap.h.</li>
 <li>Test the trap handling code using some of the test programs in the user directory that cause exceptions, such as user/divzero.</li>
