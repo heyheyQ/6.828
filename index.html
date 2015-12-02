@@ -258,6 +258,20 @@
 <a id="part-b-page-faults-breakpoints-exceptions-and-system-calls" class="anchor" href="#part-b-page-faults-breakpoints-exceptions-and-system-calls" aria-hidden="true"><span class="octicon octicon-link"></span></a>Part B: Page Faults, Breakpoints Exceptions, and System Calls</h3>
 
 <ul>
+<li>Background:</li>
+<ul>
+<li>The page fault exception is handled in interrupt vector 14 (T_PGFLT) that stores the linear address that caused the fault in a special processor control register, CR2.</li>
+<li>The breakpoint exception is handled in interrupt vector 3 (T_BRKPT). Debuggers insert breakpoints in a program's code by temporarily replacing the relevant program instruction with the special 1-byte int3 software interrupt instruction.</li>
+<li>The application passes the system call number and the system call arguments in registers. The kernel passes the return value back in %eax.</li>
+<li>Operating systems usually rely on hardware support to implement memory protection.</li>
+<li>The OS keeps the hardware informed about which virtual addresses are valid and which are not.</li>
+<li>When a program tries to access an invalid address or one for which it has no permissions, the processor stops the program at the instruction causing the fault and then traps into the kernel with information about the attempted operation.</li>
+<li>As an example of a fixable fault, consider an automatically extended stack:
+<ul>
+<li>The kernel initially allocates a single stack page, and then if a program faults accessing pages further down the stack, the kernel will allocate those pages automatically and let the program continue.</li>
+</ul>
+</li>
+</ul>
 <li>Objectives:</li>
 <ol type = "1">
 <li>Handle page faults</li>
@@ -270,39 +284,21 @@
 <li>Procedures:</li>
 <ul>
 <li> 1.</li>
-<li>Modify trap_dispatch() in kern/trap.c to dispatch page fault exceptions to page_fault_handler().
-
-<ul>
-<li>The page fault exception is handled in interrupt vector 14 (T_PGFLT) that stores the linear address that caused the fault in a special processor control register, CR2.</li>
-</ul>
-</li>
-</ul>
+<li>Modify trap_dispatch() in kern/trap.c to dispatch page fault exceptions to page_fault_handler().</li>
 
 <li> 2.</li>
-<ul>
-<li>Modify trap_dispatch() in kern/trap.c to make breakpoint exceptions invoke the kernel monitor.
-
-<ul>
-<li>The breakpoint exception is handled in interrupt vector 3 (T_BRKPT). Debuggers insert breakpoints in a program's code by temporarily replacing the relevant program instruction with the special 1-byte int3 software interrupt instruction.</li>
-</ul>
-</li>
-</ul>
-</li>
+<li>Modify trap_dispatch() in kern/trap.c to make breakpoint exceptions invoke the kernel monitor.</li>
 
 <li> 3.</li>
 <ul>
-<li>Edit kern/trapentry.S and trap_init() in kern/trap.c to add a handler in the kernel for interrupt vector T_SYSCALL, and change trap_dispatch() to handle the system call interrupt by calling syscall().
-
-<ul>
+<li>Edit kern/trapentry.S and trap_init() in kern/trap.c to add a handler in the kernel for interrupt vector T_SYSCALL.
+<li>Change trap_dispatch() to handle the system call interrupt by calling syscall().
 <li>Use int $0x30 as the system call interrupt, and set up the interrupt descriptor to allow user processes to cause the interrupt.</li>
-<li>The application passes the system call number and the system call arguments in registers. The kernel passes the return value back in %eax.</li>
-</ul>
+</li>
 </li>
 </ul>
-</li>
 
 <li> 4.</li>
-<ul>
 <li>Modify libmain() in lib/libmain.c to initialize the global pointer thisenv to point at the environment's struct Env in the envs[] array.
 
 <ul>
@@ -315,20 +311,9 @@
 <li>The kernel should report that it has destroyed the only environment and then drop into the kernel monitor.</li>
 </ul>
 </li>
-</ul>
 </li>
 
 <li> 5.</li>
-<ul>
-<li>Operating systems usually rely on hardware support to implement memory protection.</li>
-<li>The OS keeps the hardware informed about which virtual addresses are valid and which are not.</li>
-<li>When a program tries to access an invalid address or one for which it has no permissions, the processor stops the program at the instruction causing the fault and then traps into the kernel with information about the attempted operation.</li>
-<li>As an example of a fixable fault, consider an automatically extended stack:
-
-<ul>
-<li>The kernel initially allocates a single stack page, and then if a program faults accessing pages further down the stack, the kernel will allocate those pages automatically and let the program continue.</li>
-</ul>
-</li>
 <li>Change kern/trap.c to panic if a page fault happens in kernel mode.
 
 <ul>
