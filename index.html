@@ -27,14 +27,20 @@
 
 <ul>
 <li>Background:</li>
+<ul>
 <li>Inline assembly for x86 in Linux, includes:</li>
 <li>register naming (%eax), source and destination ordering, immediate operand ($0xffff), indirect memory reference</li>
 <li>Layout of the PC's physical address space, includes where the BIOS is loaded into and where the memory mapped devices (MMIO) lies.</li>
+</ul>
 <li>Objective:</li>
+<ul>
 <li>Investigate how an IA-32 compatible computer boots.
+</ul>
 <li>Methods:</li>
+<ul>
 <li>Use the QEMU emulator simulating the x86 hardware to boot the compiled kernel.</li>
 <li>Use the GNU debugger (GDB) to step through the early boot process.</li>
+</ul>
 <li>Results:</li>
 <ul>
 <li>Simplified flow is: BIOS (at physical address 0x000ffff0) =&gt; bootloader loaded at IP=0x7c00 =&gt; bootloader reads the remaining sectors of the kernel from the disk.</li>
