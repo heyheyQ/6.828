@@ -100,6 +100,10 @@
 <li>Memory Paging
 <li>C calling convention, stack frame and function call
 </ul>
+<li>Objective:</li>
+<ul>
+<li>Print debug information on the console.
+</ul>
 <li>Procedures:</li>
 <ul>
 <li>Map the first 4MB of physical memory using the statically-initialized page directory and page table in kern/entrypgdir.c.
@@ -116,14 +120,20 @@
 <a id="part-1-physical-page-management" class="anchor" href="#part-1-physical-page-management" aria-hidden="true"><span class="octicon octicon-link"></span></a>Part 1: Physical Page Management</h3>
 
 <ul>
-<li>Implement the physical page allocator (refer to kern/pmap.c), which requires the knowledge of hardware structures to manage memory in x86 hardware.
-
+<li>Background:</li>
 <ul>
 <li>The translation between logical address, linear address, and physical address.</li>
-<li>Segmentation: global descriptor table (GDT) and local descriptor table (LDT), segment registers, segment selectors, and the fields affecting how the memory controller translates the addresses</li>
+<li>Hardware structures to manage memory in x86 hardware, includes:</li>
+<ul>
+	<li>Segmentation: global descriptor table (GDT) and local descriptor table (LDT)</li>
+	<li>segment registers, segment selectors, and the fields affecting how the memory controller translates the addresses</li>
+</ul>
 <li>Virtual address and page table</li>
 </ul>
-</li>
+<li>Objective:</li>
+<ul>
+<li>Implement the physical page allocator (refer to kern/pmap.c).
+</ul>
 </ul>
 
 <h3>
