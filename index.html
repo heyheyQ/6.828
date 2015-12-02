@@ -282,14 +282,18 @@
 </ol>
 
 <li>Procedures:</li>
+<ol type = "1">
+<li>Handle page faults</li>
 <ul>
-<li> 1.</li>
 <li>Modify trap_dispatch() in kern/trap.c to dispatch page fault exceptions to page_fault_handler().</li>
+</ul>
 
-<li> 2.</li>
+<li>Handle the breakpoint exception</li>
+<ul>
 <li>Modify trap_dispatch() in kern/trap.c to make breakpoint exceptions invoke the kernel monitor.</li>
+</ul>
 
-<li> 3.</li>
+<li>Implement System calls</li>
 <ul>
 <li>Edit kern/trapentry.S and trap_init() in kern/trap.c to add a handler in the kernel for interrupt vector T_SYSCALL.
 <li>Change trap_dispatch() to handle the system call interrupt by calling syscall().
@@ -298,7 +302,8 @@
 </li>
 </ul>
 
-<li> 4.</li>
+<li>Startup user-mode</li>
+<ul>
 <li>Modify libmain() in lib/libmain.c to initialize the global pointer thisenv to point at the environment's struct Env in the envs[] array.
 
 <ul>
@@ -312,8 +317,10 @@
 </ul>
 </li>
 </li>
+</ul>
 
-<li> 5.</li>
+<li>Test Page faults and memory protection in kernel</li>
+<ul>
 <li>Change kern/trap.c to panic if a page fault happens in kernel mode.
 
 <ul>
@@ -340,8 +347,9 @@
 </li>
 <li>Boot the kernel, running user/evilhello. The environment should be destroyed, and the kernel should not panic.</li>
 </ul>
-</li>
 </ul>
+</li>
+</ol>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/heyheyQ/6.828">6.828</a> is maintained by <a href="https://github.com/heyheyQ">heyheyQ</a>.</span>
