@@ -29,7 +29,9 @@
 <li>Background:</li>
 <ul>
 <li>Inline assembly for x86 in Linux, includes:
+<ul>
 <li>register naming (%eax), source and destination ordering, immediate operand ($0xffff), indirect memory reference
+</ul>
 <li>Layout of the PC's physical address space, includes where the BIOS is loaded into and where the memory mapped devices (MMIO) lies.
 </ul>
 <li>Objective:</li>
@@ -93,10 +95,18 @@
 <a id="part-3-kernel" class="anchor" href="#part-3-kernel" aria-hidden="true"><span class="octicon octicon-link"></span></a>Part 3: Kernel</h3>
 
 <ul>
-<li>Map the first 4MB of physical memory using the statically-initialized page directory and page table in kern/entrypgdir.c.</li>
-<li>Program the code to support formatted printing to the console (refer to lib/printfmt.c).</li>
-<li>According to the C calling conventions on the x86 and the content of stack when the nested call instructions execute, implement a stack backtrace function (refer to kern/monitor.c). </li>
-<li>Modify the stack backtrace function to display, for each eip, the function name, source file name, and line number corresponding to that eip (refer to kern/kdebug.c).</li>
+<li>Background:</li>
+<ul>
+<li>Memory Paging
+<li>C calling convention, stack frame and function call
+</ul>
+<li>Procedures:</li>
+<ul>
+<li>Map the first 4MB of physical memory using the statically-initialized page directory and page table in kern/entrypgdir.c.
+<li>Program the code to support formatted printing to the console (refer to lib/printfmt.c).
+<li>When the nested call instructions execute, implement a stack backtrace function (refer to kern/monitor.c).
+<li>Modify the stack backtrace function to display, for each eip, the function name, source file name, and line number corresponding to that eip (refer to kern/kdebug.c).
+</ul>
 </ul>
 
 <h2>
