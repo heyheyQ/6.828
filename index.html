@@ -169,12 +169,14 @@
 <a id="lab-3-user-environments" class="anchor" href="#lab-3-user-environments" aria-hidden="true"><span class="octicon octicon-link"></span></a>Lab 3: User Environments</h2>
 
 <ul>
-<li>Goal: Initially create one user environment, and then design the JOS kernel to support multiple environments.</li>
+<li>Objectives: Initially create one user environment, and then design the JOS kernel to support multiple environments.</li>
 </ul>
 
 <h3>
 <a id="part-a-user-environments-and-exception-handling" class="anchor" href="#part-a-user-environments-and-exception-handling" aria-hidden="true"><span class="octicon octicon-link"></span></a>Part A: User Environments and Exception Handling</h3>
 
+<ul>
+<li>Background:</li>
 <ul>
 <li>a JOS "environment" couples the concepts of "thread" and "address space":
 
@@ -183,46 +185,13 @@
 <li>The address space is defined by the page directory and page tables (i.e., struct env_pgdir)</li>
 <li>There can be only a JOS environment active in the kernel at a time, so JOS needs only a single kernel stack.</li>
 </ul>
-</li>
-<li>Modify mem_init() in kern/pmap.c to allocate and map the struct envs array.</li>
-<li>Create and run environments:
-
+<li>Options in the linker command line
+<li>Privilege level 0 (kernel) and privilege level 3 (user) in x86 hardware
+<li>2-level virtual address translation: PDE (entry of page directory) and PTE (entry of page table)
+<li>ELF object file format, code section and data section in object file, how to load an executable into memory
+<li>x86 interrupt and exception mechanism, includes:
 <ul>
-<li>Because we do not yet have a filesystem, we set up the kernel to load a static binary image that is built-in the kernel itself.
-
-<ul>
-<li>Refer to the -b binary option on the linker command line in kern/Makefrag</li>
-</ul>
-</li>
-<li>Implement the functions in env.c to set up a JOS user environment:
-
-<ul>
-<li>Configures the segmentation hardware with separate segments for privilege level 0 (kernel) and privilege level 3 (user).
-(refer to env_init() in env.c)
-
-<ul>
-<li>With the knowledge of 2-level virtual address translation: PDE (entry of page directory) and PTE (entry of page table)</li>
-</ul>
-</li>
-<li>Allocate a page directory for a new environment and initialize the kernel portion of the new environment's address space.
-(refer to env_setup_vm() in env.c)</li>
-<li>Parse an ELF binary image, and load its contents into the user address space of a new environment.
-(refer to load_icode() in env.c)</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>Handle interrupts and exceptions:
-
-<ul>
-<li>Implement basic exception and system call handling for kernel to recover control of the processor from user-mode code.
-
-<ul>
-<li>With the knowledge of the x86 interrupt and exception mechanism</li>
-</ul>
-</li>
-<li>An interrupt is a protected control transfer that is caused by an asynchronous event usually external to the processor.
-
+<li>An interrupt is a protected control transfer that is caused by an asynchronous event usually external to the processor.</li>
 <ul>
 <li>The interrupt descriptor table (IDT):
 
@@ -239,7 +208,47 @@
 </ul>
 </li>
 </ul>
+</ul>
 </li>
+</li>
+</li>
+</li>
+</li>
+<li>Objectives:</li>
+<ul>
+<li>Create and run environments.
+<li>Handle interrupts and exceptions.
+</ul>
+</li>
+</li>
+<li>Procedures:</li>
+<ul>
+<li>Modify mem_init() in kern/pmap.c to allocate and map the struct envs array.</li>
+
+<ul>
+<li>Set up the kernel to load a static binary image that is built-in the kernel itself, because the lack of filesystem.
+
+<ul>
+<li>Refer to the -b binary option on the linker command line in kern/Makefrag</li>
+</ul>
+</li>
+<li>Implement the functions in env.c to set up a JOS user environment:
+
+<ul>
+<li>Configures the segmentation hardware with separate segments for privilege level 0 (kernel) and privilege level 3 (user).
+(refer to env_init() in env.c)
+
+</li>
+<li>Allocate a page directory for a new environment and initialize the kernel portion of the new environment's address space.
+(refer to env_setup_vm() in env.c)</li>
+<li>Parse an ELF binary image, and load its contents into the user address space of a new environment.
+(refer to load_icode() in env.c)</li>
+</ul>
+</li>
+</ul>
+
+<li>Implement basic exception and system call handling for kernel to recover control of the processor from user-mode code.</li>
+
 <li>Set up the IDT:
 
 <ul>
@@ -248,7 +257,7 @@
 </ul>
 </li>
 </ul>
-</li>
+</ul>
 </ul>
 
 <h3>
